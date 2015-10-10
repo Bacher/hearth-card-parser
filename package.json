@@ -1,0 +1,14 @@
+{
+  "name": "hearth-card-parser",
+  "version": "0.0.0",
+  "description": "",
+  "main": "parser.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bacher <bacherko@gmail.com>",
+  "license": "GPLv2",
+  "dependencies": {
+    "request": "^2.64.0"
+  }
+}
