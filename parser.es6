@@ -2,8 +2,8 @@
 const fs = require('fs');
 const request = require('request');
 
-const REQUEST_TIMEOUT = 1000;
-const REPEAT_TIMEOUT = 3000;
+const REQUEST_TIMEOUT = 200;
+const REPEAT_TIMEOUT = 1000;
 
 var ok = true;
 var urls = [];
@@ -12,7 +12,7 @@ var ends = 0;
 
 
 // 4 5 7
-processPage(7, 1);
+processPage(4, 1);
 
 
 function processPage(type, page) {
@@ -21,13 +21,10 @@ function processPage(type, page) {
     console.log('Page %s', page);
 
     request(url, (error, response, body) => {
-        if (error) {
-            console.warn(url);
-            throw error;
-        }
-
-        if (response.statusCode !== 200) {
-            console.warn(url, 'STATUS CODE', response.statusCode);
+        if (error || response.statusCode !== 200) {
+            setTimeout(() => {
+                processPage(type, page);
+            }, REPEAT_TIMEOUT);
 
         } else {
             urls = urls.concat(parseList(body));
@@ -49,11 +46,11 @@ function parseList(html) {
 
     const urls = [];
 
-    for (var i = 1500, count = lines.length; i < count; ++i) {
+    for (var i = 1000, count = lines.length; i < count; ++i) {
         var line = lines[i];
 
         if (line.indexOf('manual-data-link') !== -1) {
-            const match = line.trim().match(/^<a class="[^"]*manual-data-link[^"]*" href="([^"]+)" data-id="[^"]+" data-type-id="[^"]*" >[^<]+<\/a>$/);
+            const match = line.trim().match(/<a class="[^"]*manual-data-link[^"]*" href="([^"]+)"[^>]*>[^<]+<\/a>/);
 
             urls.push(match[1]);
         }
@@ -86,7 +83,7 @@ function processCard(index, isRepeat) {
         });
 
     } else {
-        fs.writeFileSync('cards.json', JSON.stringify(cards));
+        fs.writeFileSync('uses.json', JSON.stringify(cards, null, 2).replace(/&#x27;/g, "'"));
     }
 }
 
